@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 using RestSharp;
 using RestSharp.Deserializers;
 using RestSharp.Serializers;
@@ -72,16 +73,15 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             {
                 case PlasticStraws:
                     var badbusiness = _places.Find(b => $"{b.Name} ({b.Vicinity})" == _establishment);
+                    PostToApi(badbusiness, 1);
                     await context.PostAsync(
                         $"That's sad to hear about {badbusiness.Name}. We have recorded this so that other people can avoid this establishment");
-                    PostToApi(badbusiness, 1);
-
                     break;
                 case NoPlasticStraws:
                     var goodbusiness = _places.Find(b => b.Name == _establishment);
+                    PostToApi(goodbusiness, 0);
                     await context.PostAsync(
                         $"{goodbusiness.Name} is great! We will tell people that they can come here to support an establishment that cares about our environment");
-                    PostToApi(goodbusiness, 0);
                     break;
                 default:
                     await context.PostAsync("Sorry, I didn't understand");
@@ -93,22 +93,23 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private static void PostToApi(BussinessResults badbusiness, int straws)
         {
-            var restClient = new RestClient("https://requestb.in");
-            var request = new RestRequest("/1e9aae61",
-                Method.POST)
-            {
-                RequestFormat = DataFormat.Json,
-            };
-            request.AddJsonBody(new
-            {
-                Id = badbusiness.Id,
-                Name = badbusiness.Name,
-                Latitude = badbusiness.location.lat,
-                Longitude = badbusiness.location.lng,
-                Straws = straws
-            });
             try
             {
+                var restClient = new RestClient("https://econotts-api.azurewebsites.net/api/");
+                var request = new RestRequest("/establishment/add",
+                    Method.POST)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                request.AddBody(new PostObject
+                {
+                    Id = badbusiness.Id,
+                    Name = badbusiness.Name,
+                    Latitude = badbusiness.geometry.location.lat,
+                    Longitude = badbusiness.geometry.location.lng,
+                    Straws = straws
+                });
+
                 restClient.Execute(request);
             }
             catch (Exception e)
@@ -129,14 +130,30 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public Location location { get; set; }
+        public Geometry geometry { get; set; }
         public string Vicinity { get; set; }
     }
 
+    [Serializable]
+    public class Geometry
+    {
+        public Location location { get; set; }
+    }
+    
     [Serializable]
     public class Location
     {
         public decimal lat { get; set; }
         public decimal lng { get; set; }
+    }
+
+    [Serializable]
+    public class PostObject
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public int Straws { get; set; }
     }
 }
