@@ -28,19 +28,19 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var message = await argument;
-            
-            var restClient = new RestClient("http://spatial.virtualearth.net/REST/v1/");
-            var request = new RestRequest("/data/c2ae584bbccc4916a0acf75d1e6947b4/NavteqEU/NavteqPOIs",
+
+            var restClient = new RestClient("https://maps.googleapis.com/maps/api/");
+            var request = new RestRequest("place/nearbysearch/json",
                 Method.GET)
             {
                 RequestFormat = DataFormat.Json,
                 JsonSerializer = new JsonSerializer()
             };
-            request.AddQueryParameter("spatialFilter", "nearby('Nottingham',100)");
-            request.AddQueryParameter("entityTypeName", "Business");
-            request.AddQueryParameter("$format", "json");
-            request.AddQueryParameter("$top", "5");
-            
+            request.AddQueryParameter("location", "52.954783,-1.158109");
+            request.AddQueryParameter("radius", "5000");
+            request.AddQueryParameter("type", "restaurant");
+            request.AddQueryParameter("keyword", message.Text);
+
             var environmentVariable = Environment.GetEnvironmentVariable("BING_API_KEY");
 
             request.AddQueryParameter("key",
@@ -48,11 +48,11 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
                     ? ConfigurationManager.AppSettings.Get("BING_API_KEY")
                     : environmentVariable);
 
-            var restResponse = restClient.Execute<TheResponse>(request);
+            var restResponse = restClient.Execute<SomeData>(request);
 
-            _places = restResponse.Data.d.results;
+            _places = restResponse.Data.results;
             PromptDialog.Choice(context, SelectAsync,
-                restResponse.Data.d.results.Select(b => b.Name).ToList(),
+                restResponse.Data.results.Select(b => $"{b.Name} ({b.Vicinity})").ToList(),
                 "Which one of these did you mean?");
         }
 
@@ -71,14 +71,17 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             switch (choice)
             {
                 case PlasticStraws:
-                    var badbusiness = _places.Find(b => b.Name == _establishment);
+                    var badbusiness = _places.Find(b => $"{b.Name} ({b.Vicinity})" == _establishment);
                     await context.PostAsync(
-                        $"That's sad to hear {badbusiness.EntityID}. We have recorded this so that other people can avoid this establishment");
+                        $"That's sad to hear about {badbusiness.Name}. We have recorded this so that other people can avoid this establishment");
+                    PostToApi(badbusiness, 1);
+
                     break;
                 case NoPlasticStraws:
                     var goodbusiness = _places.Find(b => b.Name == _establishment);
                     await context.PostAsync(
-                        $"Great {goodbusiness.EntityID}! We will tell people that they can come here to support an establishment that cares about our environment");
+                        $"{goodbusiness.Name} is great! We will tell people that they can come here to support an establishment that cares about our environment");
+                    PostToApi(goodbusiness, 0);
                     break;
                 default:
                     await context.PostAsync("Sorry, I didn't understand");
@@ -87,12 +90,32 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
             context.Done("");
         }
-    }
 
-    [Serializable]
-    public class TheResponse
-    {
-        public SomeData d { get; set; }
+        private static void PostToApi(BussinessResults badbusiness, int straws)
+        {
+            var restClient = new RestClient("https://requestb.in");
+            var request = new RestRequest("/1e9aae61",
+                Method.POST)
+            {
+                RequestFormat = DataFormat.Json,
+            };
+            request.AddJsonBody(new
+            {
+                Id = badbusiness.Id,
+                Name = badbusiness.Name,
+                Latitude = badbusiness.location.lat,
+                Longitude = badbusiness.location.lng,
+                Straws = straws
+            });
+            try
+            {
+                restClient.Execute(request);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
     }
 
     [Serializable]
@@ -104,10 +127,16 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     [Serializable]
     public class BussinessResults
     {
-        public string EntityID { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
-        public string PostalCode { get; set; }
+        public Location location { get; set; }
+        public string Vicinity { get; set; }
+    }
+
+    [Serializable]
+    public class Location
+    {
+        public decimal lat { get; set; }
+        public decimal lng { get; set; }
     }
 }
