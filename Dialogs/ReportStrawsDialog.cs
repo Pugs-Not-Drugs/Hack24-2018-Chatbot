@@ -105,8 +105,8 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
                 {
                     Id = badbusiness.Id,
                     Name = badbusiness.Name,
-                    Latitude = badbusiness.geometry.location.lat,
-                    Longitude = badbusiness.geometry.location.lng,
+                    Latitude = badbusiness.geometry.location.lat.ToString(),
+                    Longitude = badbusiness.geometry.location.lng.ToString(),
                     Straws = straws
                 });
 
@@ -152,8 +152,8 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public decimal Latitude { get; set; }
-        public decimal Longitude { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
         public int Straws { get; set; }
     }
 }
