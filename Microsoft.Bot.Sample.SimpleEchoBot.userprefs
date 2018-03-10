@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{9C7E3A46-B60F-4052-9A21-DC8D1A942216}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Web.config">
+    <Files>
+      <File FileName="App_Start/WebApiConfig.cs" Line="23" Column="13" />
+      <File FileName="Controllers/MessagesController.cs" Line="33" Column="10" />
+      <File FileName="packages.config" Line="1" Column="1" />
+      <File FileName="Web.config" Line="102" Column="32" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>
