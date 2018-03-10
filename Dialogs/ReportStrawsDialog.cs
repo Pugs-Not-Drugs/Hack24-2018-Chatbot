@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
@@ -93,28 +95,18 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private static void PostToApi(BussinessResults badbusiness, int straws)
         {
-            try
-            {
-                var restClient = new RestClient("https://econotts-api.azurewebsites.net/api/");
-                var request = new RestRequest("/establishment/add",
-                    Method.POST)
-                {
-                    RequestFormat = DataFormat.Json
-                };
-                request.AddBody(new PostObject
-                {
-                    Id = badbusiness.Id,
-                    Name = badbusiness.Name,
-                    Latitude = badbusiness.geometry.location.lat.ToString(),
-                    Longitude = badbusiness.geometry.location.lng.ToString(),
-                    Straws = straws
-                });
+            HttpClient client = new HttpClient();
+            List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
+            values.Add(new KeyValuePair<string, string>("Id", badbusiness.Id));
+            values.Add(new KeyValuePair<string, string>("Name", badbusiness.Name));
+            values.Add(new KeyValuePair<string, string>("Latitude", badbusiness.geometry.location.lat.ToString()));
+            values.Add(new KeyValuePair<string, string>("Longitude", badbusiness.geometry.location.lng.ToString()));
+            values.Add(new KeyValuePair<string, string>("Straws", straws.ToString()));
 
-                restClient.Execute(request);
-            }
-            catch (Exception e)
+            using (FormUrlEncodedContent content = new FormUrlEncodedContent(values))
             {
-                Console.WriteLine(e);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+                client.PostAsync("https://econotts-api.azurewebsites.net/api/establishment/add", content);
             }
         }
     }
@@ -139,7 +131,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     {
         public Location location { get; set; }
     }
-    
+
     [Serializable]
     public class Location
     {
