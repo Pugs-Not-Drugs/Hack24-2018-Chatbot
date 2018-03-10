@@ -22,6 +22,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         public async Task StartAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
+            var message = await argument;
             PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"a", "b", "c"}, "ok how about the alphabet?");            
             context.Wait(MessageReceivedAsync);
         }
