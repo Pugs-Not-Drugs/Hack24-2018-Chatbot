@@ -95,15 +95,17 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private static void PostToApi(BussinessResults badbusiness, int straws)
         {
-            HttpClient client = new HttpClient();
-            List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
-            values.Add(new KeyValuePair<string, string>("Id", badbusiness.Id));
-            values.Add(new KeyValuePair<string, string>("Name", badbusiness.Name));
-            values.Add(new KeyValuePair<string, string>("Latitude", badbusiness.geometry.location.lat.ToString()));
-            values.Add(new KeyValuePair<string, string>("Longitude", badbusiness.geometry.location.lng.ToString()));
-            values.Add(new KeyValuePair<string, string>("Straws", straws.ToString()));
+            var client = new HttpClient();
+            var values = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("Id", badbusiness.Id),
+                new KeyValuePair<string, string>("Name", badbusiness.Name),
+                new KeyValuePair<string, string>("Latitude", badbusiness.geometry.location.lat.ToString()),
+                new KeyValuePair<string, string>("Longitude", badbusiness.geometry.location.lng.ToString()),
+                new KeyValuePair<string, string>("Straws", straws.ToString())
+            };
 
-            using (FormUrlEncodedContent content = new FormUrlEncodedContent(values))
+            using (var content = new FormUrlEncodedContent(values))
             {
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
                 client.PostAsync("https://econotts-api.azurewebsites.net/api/establishment/add", content);

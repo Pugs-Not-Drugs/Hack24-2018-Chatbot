@@ -186,6 +186,7 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\ReportStrawsDialog.cs" />
+    <Compile Include="Dialogs\SpellCheck.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
