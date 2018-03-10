@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
 using System.Net.Http;
@@ -16,14 +15,8 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         public async Task StartAsync(IDialogContext context)
         {
-            await context.PostAsync($"Welcome {context.Activity.From.Name}");
-            context.Wait(StartAsync);
-        }
-
-        public async Task StartAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
-        {
-            var message = await argument;
-            PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"a", "b", "c"}, "ok how about the alphabet?");            
+            await context.PostAsync($"Welcome {context.Activity.From.Name}, I\'m ready to help you make Nottingham more eco-friendly. Talk to me about:" +
+                                    "Impact of plastic straws on the environment, Reporting use of plastic straws in cafés/ bars/ restaurants etc.");
             context.Wait(MessageReceivedAsync);
         }
 
@@ -33,6 +26,10 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
             switch (message.Text)
             {
+                case "hello":
+                    PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"Learn about the impact of plastic straws on the environment", "Report an establishments straw policy"},
+                        $"Hello there {context.Activity.From.Name}, would you like to:");
+                    break;
                 case "reset":
                     PromptDialog.Confirm(
                         context,
@@ -42,7 +39,8 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
                         promptStyle: PromptStyle.Auto);
                     break;
                 case "talk about something more intresting":
-                    PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"a", "b", "c"}, "ok how about the alphabet?");
+                    PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"a", "b", "c"},
+                        "ok how about the alphabet?");
                     break;
                 default:
                     await context.PostAsync($"{Count++}: You said {message.Text}");
@@ -63,6 +61,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             {
                 await context.PostAsync("Did not reset count.");
             }
+
             context.Wait(MessageReceivedAsync);
         }
 
@@ -71,16 +70,19 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             var choice = await argument;
             switch (choice)
             {
-                case "a":
-                    await context.PostAsync("a");
+                case "Learn about the impact of plastic straws on the environment":
+                    await context.PostAsync("Straws have a terrible impact on the environment https://www.isfoundation.com/infographic/final-straw-infographic");
                     break;
-                case "b":
-                    await context.PostAsync("b");
+                case "Report an establishments straw policy":
+                    await context.PostAsync("STRAWS!");
                     break;
-                case "c":
-                    await context.PostAsync("c");
+                default:
+                    await context.PostAsync("Sorry, I didn't understand");
+                    PromptDialog.Choice(context, AfterMoreIntrestingAsync, new List<string> {"Learn about the impact of plastic straws on the environment", "Report an establishments straw policy"},
+                        $"Would you like to:");
                     break;
             }
+
             context.Wait(MessageReceivedAsync);
         }
     }
