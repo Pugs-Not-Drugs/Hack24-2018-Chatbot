@@ -43,7 +43,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
             var messageText = await SpellCheck.RunThroughSpellCheck(message.Text);
 
-            if (messageText == "hello")
+            if (messageText.Contains("hello") || messageText.Contains("hi"))
             {
                 PromptDialog.Choice(context, AfterMoreIntrestingAsync,
                     new List<string> {LearnAboutStraws, ReportAnEstablishmentsStrawPolicy},

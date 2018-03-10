@@ -54,9 +54,16 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             var restResponse = restClient.Execute<SomeData>(request);
 
             _places = restResponse.Data.results;
-            PromptDialog.Choice(context, SelectAsync,
-                restResponse.Data.results.Select(b => $"{b.Name} ({b.Vicinity})").ToList(),
-                "Which one of these did you mean?");
+            if (_places.Count == 0)
+            {
+                await context.PostAsync("Sorry, I couldn't find that establishment");
+            }
+            else
+            {
+                PromptDialog.Choice(context, SelectAsync,
+                    restResponse.Data.results.Select(b => $"{b.Name} ({b.Vicinity})").ToList(),
+                    "Which one of these did you mean?");
+            }
         }
 
         public async Task SelectAsync(IDialogContext context, IAwaitable<string> argument)
