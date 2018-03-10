@@ -13,8 +13,22 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     [Serializable]
     public class RootDialog : IDialog<object>
     {
-        private const string LearnAboutStraws = "Learn about the impact of plastic straws on the environment";
+        private static readonly Random RandomGen = new Random();
+
+        private const string LearnAboutStraws = "Tell me about plastic straws";
         private const string ReportAnEstablishmentsStrawPolicy = "Report an establishments straw policy";
+
+        private static readonly List<string> StrawFacts = new List<string>
+        {
+            "Plastic straws are among the top 10 plastic debris found during coastal cleanups",
+            "An estimated 100,000 marine animals are killed every year due to plastic debris",
+            "80 - 90% of the debris that ends up in the ocean is plastic",
+            "More straws means increased plastic production requiring more oil and gas is needed for energy for manufacturing and distribution. This means more carbon emissions and pollution",
+            "Reusable straws are an earth friendly option! If you want to use straws, why not carry your own reusable one? They come in all colours and even with cute characters for your kids",
+            "Alternative materials to plastic for straws include bamboo, metal, glass, straw or paper",
+            "Plastic straws may be small but are a big concern - Their size makes it hard to pick them out for recycling. They also easily find their way into bodies of water. Moreover, marine animals mistake straws for food.",
+            "The amount of marine litter found on UK beaches has more than doubled in the last 15 years."
+        };
 
         public async Task StartAsync(IDialogContext context)
         {
@@ -34,7 +48,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
                     new List<string> {LearnAboutStraws, ReportAnEstablishmentsStrawPolicy},
                     $"Hello there {context.Activity.From.Name}, would you like to:");
             }
-            else if(message.Text.Contains("report") && message.Text.Contains("straw"))
+            else if (message.Text.Contains("report") && message.Text.Contains("straw"))
             {
                 context.Call(new ReportStrawsDialog(), ResumeAfterNewOrderDialog);
             }
@@ -71,8 +85,9 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private static async Task TeachAboutStraws(IDialogContext context)
         {
-            await context.PostAsync(
-                "Straws have a terrible impact on the environment https://www.isfoundation.com/infographic/final-straw-infographic");
+            var next = RandomGen.Next(0, StrawFacts.Count);
+            var strawFact = StrawFacts[next];
+            await context.PostAsync(strawFact);
         }
 
         private async Task ResumeAfterNewOrderDialog(IDialogContext context, IAwaitable<string> result)
