@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 
@@ -16,6 +17,8 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private const string LearnAboutStraws = "Tell me about plastic straws";
         private const string ReportAnEstablishmentsStrawPolicy = "Report an establishments straw policy";
+        
+
 
         private static readonly List<string> StrawFacts = new List<string>
         {
@@ -41,7 +44,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
         {
             var message = await argument;
 
-            var messageText = await SpellCheck.RunThroughSpellCheck(message.Text);
+            var messageText = await CogHelpers.RunThroughSpellCheck(message.Text);
 
             if (messageText.Contains("hello") || messageText.Contains("hi"))
             {
@@ -56,6 +59,11 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             else if (messageText.Contains("info") || messageText.Contains("about") && message.Text.Contains("straw"))
             {
                 await TeachAboutStraws(context);
+            }
+            else if(await CogHelpers.IsStrawPolicyQuestion(messageText))
+            {
+                await context.PostAsync("YESSSSS!!!!!");
+                context.Wait(MessageReceivedAsync);
             }
             else
             {
