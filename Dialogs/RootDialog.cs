@@ -55,11 +55,11 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
             var messageText = await CogHelpers.RunThroughSpellCheck(message.Text);
 
-            if (messageText.Contains("hello") || messageText.Contains("hi"))
+            if (messageText.Contains("hello") || messageText.Contains("Hello") || messageText.Contains("hi") || messageText.Contains("Hi") || messageText.Contains("ok") || messageText.Contains("OK"))
             {
                 PromptDialog.Choice(context, AfterMoreIntrestingAsync,
                     new List<string> {LearnAboutStraws, ReportAnEstablishmentsStrawPolicy},
-                    $"Hello there {context.Activity.From.Name}, would you like to:");
+                    $"Would you like to:");
             }
             else if (messageText.Contains("report") && messageText.Contains("straw"))
             {
