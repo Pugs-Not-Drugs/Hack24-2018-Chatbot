@@ -84,7 +84,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
                     var badbusiness = _places.Find(b => $"{b.Name} ({b.Vicinity})" == _establishment);
                     PostToApi(badbusiness, 1);
                     await context.PostAsync(
-                        $"That's sad to hear about {badbusiness.Name}. We have recorded this so that other people can avoid this establishment. Checkout https://econotts.iamawizard.co.uk/straws to find a place that is more turle friendly");
+                        $"That's sad to hear about {badbusiness.Name}. We have recorded this so that other people can avoid this establishment. Checkout https://econotts.iamawizard.co.uk/straws to find a place that is more turtle friendly");
                     break;
                 case NoPlasticStraws:
                     var goodbusiness = _places.Find(b => b.Name == _establishment);
