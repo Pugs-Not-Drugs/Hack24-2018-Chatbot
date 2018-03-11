@@ -43,8 +43,9 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
         public async Task StartAsync(IDialogContext context)
         {
             await context.PostAsync(
-                $"Welcome {context.Activity.From.Name}, I\'m ready to help you make Nottingham more eco-friendly. Talk to me about:" +
-                "Impact of plastic straws on the environment, Reporting use of plastic straws in cafés/ bars/ restaurants etc.");
+                $"Welcome {context.Activity.From.Name}, I\'m ready to help you make Nottingham more eco-friendly. Talk to me about: " +
+                "Impact of plastic straws on the environment, Reporting use of plastic straws in cafés/ bars/ restaurants etc." +
+                "\n Please visit our site at https://econotts.iamawizard.co.uk/ to learn more about helping the Nottingham community");
             context.Wait(MessageReceivedAsync);
         }
 

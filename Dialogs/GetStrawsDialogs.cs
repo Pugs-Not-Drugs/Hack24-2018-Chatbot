@@ -28,7 +28,6 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             context.Wait(DoStrawStuff);
         }
         
-        
         private async Task DoStrawStuff(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var entities = _deserializeObject.entities.First(e => e.type == "Establishment");
