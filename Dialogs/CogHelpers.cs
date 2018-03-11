@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             return messageText;
         }
 
-        public static async Task<bool> IsStrawPolicyQuestion(string messageText)
+        public static async Task<Tuple<bool, string>> IsStrawPolicyQuestion(string messageText)
         {
             var environmentVariable = Environment.GetEnvironmentVariable("SPELL_CHECK");
             var spellcheckKey = String.IsNullOrEmpty(environmentVariable)
@@ -66,9 +66,16 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             var httpResponseMessage = await client.GetAsync(uri);
             var contentString = await httpResponseMessage.Content.ReadAsStringAsync();
             var deserializeObject = SimpleJson.SimpleJson.DeserializeObject<Something>(contentString);
-            
-            return deserializeObject.topScoringIntent.intent == "Straw Policy" &&
-                   deserializeObject.topScoringIntent.score == 1;
+
+            var entities = deserializeObject.entities.First(e => e.type == "Establishment");
+            string theentity = null;
+            if (entities != null)
+            {
+                theentity = deserializeObject.entities.First(e => e.type == "Establishment").entity;
+            }
+
+            return new Tuple<bool, string>(deserializeObject.topScoringIntent.intent == "Straw Policy" &&
+                                           deserializeObject.topScoringIntent.score == 1, theentity);
         }
     }
 
@@ -80,6 +87,13 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     public class Something
     {
         public TopIntent topScoringIntent { get; set; }
+        public List<Entities> entities { get; set; }
+    }
+
+    public class Entities
+    {
+        public string entity { get; set; }
+        public string type { get; set; }
     }
 
     public class TopIntent

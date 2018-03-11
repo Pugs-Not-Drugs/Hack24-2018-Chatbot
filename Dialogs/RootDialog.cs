@@ -60,13 +60,27 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             {
                 await TeachAboutStraws(context);
             }
-            else if(await CogHelpers.IsStrawPolicyQuestion(messageText))
-            {
-                await context.PostAsync("YESSSSS!!!!!");
-                context.Wait(MessageReceivedAsync);
-            }
             else
             {
+                var thetuple = await CogHelpers.IsStrawPolicyQuestion(messageText);
+                // get establishment back
+                
+                //pipe into google api
+                
+                // ask which of the 4 or so BKs it
+                
+                
+                //get the enity from db api
+                
+                //if none "we don't know? pls report!
+                //or
+                //return the straw status
+                
+                if (thetuple.Item1)
+                {
+                    await context.PostAsync($"YESSSSS!!!!! {thetuple.Item2}");
+                }
+                
                 context.Wait(MessageReceivedAsync);
             }
         }
