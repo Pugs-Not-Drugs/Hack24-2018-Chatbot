@@ -47,37 +47,52 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             return messageText;
         }
 
-        public static async Task<Tuple<bool, string>> IsStrawPolicyQuestion(string messageText)
-        {
-            var environmentVariable = Environment.GetEnvironmentVariable("SPELL_CHECK");
-            var spellcheckKey = String.IsNullOrEmpty(environmentVariable)
-                ? ConfigurationManager.AppSettings.Get("SPELL_CHECK")
-                : environmentVariable;
-
-            var luienvironmentVariable = Environment.GetEnvironmentVariable("LUI_KEY");
-            var luiKey = String.IsNullOrEmpty(luienvironmentVariable)
-                ? ConfigurationManager.AppSettings.Get("LUI_KEY")
-                : luienvironmentVariable;
-
-            var client = new HttpClient();
-            var uri =
-                $"https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/ebcd8903-9d89-4423-8874-0f43d03af753?subscription-key={luiKey}&spellCheck=true&bing-spell-check-subscription-key={spellcheckKey}&verbose=true&timezoneOffset=0&q={messageText}";
-
-            var httpResponseMessage = await client.GetAsync(uri);
-            var contentString = await httpResponseMessage.Content.ReadAsStringAsync();
-            var deserializeObject = SimpleJson.SimpleJson.DeserializeObject<Something>(contentString);
-
-            var entities = deserializeObject.entities.First(e => e.type == "Establishment");
-            string theentity = null;
-            if (entities != null)
-            {
-                theentity = deserializeObject.entities.First(e => e.type == "Establishment").entity;
-            }
-
-            return new Tuple<bool, string>(deserializeObject.topScoringIntent.intent == "Straw Policy" &&
-                                           deserializeObject.topScoringIntent.score == 1, theentity);
-        }
-    }
+//        public static async Task<Tuple<bool, string>> LUISDialogs(string messageText)
+//        {
+//            var environmentVariable = Environment.GetEnvironmentVariable("SPELL_CHECK");
+//            var spellcheckKey = string.IsNullOrEmpty(environmentVariable)
+//                ? ConfigurationManager.AppSettings.Get("SPELL_CHECK")
+//                : environmentVariable;
+//
+//            var luienvironmentVariable = Environment.GetEnvironmentVariable("LUI_KEY");
+//            var luiKey = string.IsNullOrEmpty(luienvironmentVariable)
+//                ? ConfigurationManager.AppSettings.Get("LUI_KEY")
+//                : luienvironmentVariable;
+//
+//            var client = new HttpClient();
+//            var uri =
+//                $"https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/ebcd8903-9d89-4423-8874-0f43d03af753?subscription-key={luiKey}&spellCheck=true&bing-spell-check-subscription-key={spellcheckKey}&verbose=true&timezoneOffset=0&q={messageText}";
+//
+//            var httpResponseMessage = await client.GetAsync(uri);
+//            var contentString = await httpResponseMessage.Content.ReadAsStringAsync();
+//            var deserializeObject = SimpleJson.SimpleJson.DeserializeObject<Something>(contentString);
+//
+//
+//
+//            if (deserializeObject.topScoringIntent.score == 1)
+//            {
+//                switch (deserializeObject.topScoringIntent.intent)
+//                {
+//                    case "Straw Policy":
+//                    
+//                        var entities = deserializeObject.entities.First(e => e.type == "Establishment");
+//                        string theentity = null;
+//                        if (entities != null)
+//                        {
+//                            theentity = deserializeObject.entities.First(e => e.type == "Establishment").entity;
+//                        }
+//
+//                        return new Tuple<bool, string>(true, theentity);
+//                        break;
+//                    
+//                }    
+//            }
+//            
+//
+//            return new Tuple<bool, string>(deserializeObject.topScoringIntent.intent == "Straw Policy" &&
+//                                           deserializeObject.topScoringIntent.score == 1, theentity);
+//        }
+   }
 
     public class SCHelper
     {
@@ -99,6 +114,6 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
     public class TopIntent
     {
         public string intent { get; set; }
-        public decimal score { get; set; }
+        public double score { get; set; }
     }
 }
